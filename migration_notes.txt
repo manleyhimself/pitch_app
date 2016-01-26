@@ -1,0 +1,87 @@
+START -- tentative
+
+Pitch flow:
+1. Match made
+2. Guy can send a pitch
+3. Then he can't send anymore messages
+4a. girl sends one message
+  5a. conversation is unlocked, guy can send more messaages
+4b. girl ignroes/delets message/pitch,
+  5b. conversation remains locked or is deleted
+
+
+class Conversation
+  locked -> :bool
+  pitch -> :bool
+
+  # has_many :messages
+
+end
+
+class Message
+  user_1_id
+  user_2_id
+end
+
+class Pitch
+
+end
+
+END -- tentative
+
+
+START -- solid
+class User
+
+has_many :likes
+has_many :users_liked, through: likee_id, class: User
+has_many :user_images
+
+
+def users_that_liked
+  User.joins(:likes).where(likes: {likee_id: self.id})
+end
+
+Likes -> 
+user_id
+likee_id #belongs to user who was liked
+
+class Like
+  belongs_to :user
+
+  after_create :tries_to_create_match
+
+  def inverse_like
+    Like.where(user_id: self.likee_id, likee_id: self.user_id).limit(1).first
+  end
+
+  private
+
+  def tries_to_create_match
+    if inverse_like.present?
+      Match.create(#pass params)
+    end
+  end
+end
+
+
+Matches ->
+
+gal_user_id :foreign_key
+guy_user_id :foreign_key
+
+
+class Match
+
+end
+
+END -- solid
+
+#Notes
+  -after like is created, if inverse_like.present? inform users of match
+    --We should minimize these queries:
+      ---1. Create like
+          --Match might be created
+      ---2. Try to find match?
+      ---perhaps like create could return a match (to minimize queries), of course, this might be bad practice
+  -thinking ahead: there should be a flag on matches, to know if a user has already seen it (that way we know if we should put it in their feed)
