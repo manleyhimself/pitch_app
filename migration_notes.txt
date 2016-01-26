@@ -85,3 +85,9 @@ END -- solid
       ---2. Try to find match?
       ---perhaps like create could return a match (to minimize queries), of course, this might be bad practice
   -thinking ahead: there should be a flag on matches, to know if a user has already seen it (that way we know if we should put it in their feed)
+
+
+#To bring up
+  -Likes table
+    -user_id ==likes==> likee_id
+      -Is user_id indescript?
