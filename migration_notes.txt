@@ -89,6 +89,8 @@ END -- solid
 
 #To bring up
   -Likes table
+    -General issues
+      -Associations aren't super descriptive
     -user_id ==likes==> likee_id
       -Is user_id indescript?
     -Maybe user_id and target_id
