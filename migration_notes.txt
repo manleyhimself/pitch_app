@@ -91,5 +91,8 @@ END -- solid
   -Likes table
     -user_id ==likes==> likee_id
       -Is user_id indescript?
+    -Maybe user_id and target_id
+      -User being the person who 'liked'
+      -target being the person who is the target of the like
   -Photos table
     -Is main_photo? needed? Would that just be the photo in position 1?
