@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160126181910) do
+ActiveRecord::Schema.define(version: 20160127022554) do
 
   create_table "images", force: :cascade do |t|
     t.integer  "user_id"
@@ -23,6 +23,8 @@ ActiveRecord::Schema.define(version: 20160126181910) do
     t.datetime "updated_at",  null: false
   end
 
+  add_index "images", ["user_id"], name: "index_images_on_user_id"
+
   create_table "likes", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "likee_id"
@@ -30,12 +32,18 @@ ActiveRecord::Schema.define(version: 20160126181910) do
     t.datetime "updated_at", null: false
   end
 
+  add_index "likes", ["likee_id"], name: "index_likes_on_likee_id"
+  add_index "likes", ["user_id"], name: "index_likes_on_user_id"
+
   create_table "matches", force: :cascade do |t|
     t.integer  "user_1_id"
     t.integer  "user_2_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_index "matches", ["user_1_id"], name: "index_matches_on_user_1_id"
+  add_index "matches", ["user_2_id"], name: "index_matches_on_user_2_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "first_name"

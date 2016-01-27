@@ -31,38 +31,6 @@ END -- tentative
 
 
 START -- solid
-class User
-
-has_many :likes
-has_many :users_liked, through: likee_id, class: User
-has_many :user_images
-
-
-def users_that_liked
-  User.joins(:likes).where(likes: {likee_id: self.id})
-end
-
-Likes -> 
-user_id
-likee_id #belongs to user who was liked
-
-class Like
-  belongs_to :user
-
-  after_create :tries_to_create_match
-
-  def inverse_like
-    Like.where(user_id: self.likee_id, likee_id: self.user_id).limit(1).first
-  end
-
-  private
-
-  def tries_to_create_match
-    if inverse_like.present?
-      Match.create(#pass params)
-    end
-  end
-end
 
 
 Matches ->

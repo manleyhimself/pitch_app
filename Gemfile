@@ -45,6 +45,7 @@ end
 
 
 group :test, :development do
+  gem 'annotate'
   gem 'rspec-rails'
   gem 'capybara'
   gem 'selenium-webdriver'
