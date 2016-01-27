@@ -1,3 +1,67 @@
+
+Creating Likes:
+
+  With Likes table (1 row for each like) and w/o matches table: 3 queries total
+    1. a like is created - 1 query
+    2. search for other first like in a before_save - 1 query
+      old_like = Like.where......
+      if old_like.present?
+        new_like.match = true
+        old_like.update(match: true) - 1 query
+      else
+        #do nothing
+      end
+
+  With Likes table (1 row for each like) and a Matches table: 3 queries total
+    1. a like is created - 1 query
+    2. search for other first like in a before_save - 1 query
+        old_like = Like.where
+        if old_like.exists?
+          Match.create - 1 query
+        end
+
+  With Likes Table (both likes in same row) and w/o matches table: 2 queries total
+    1. check to see if like exists - 1 query
+    2a. if it doesn't
+      3a. Like.create(user_id: self.id, likee_id: other_user.id, match: false) - 1 query
+    2b. if it does (@like)
+      3b. @like = {user_id: other_user_id, likee_id: self.id, match: false}
+          @like.update(match: true) - 1 query
+
+
+Querying Goals -- user.likes, user.likees and user.matches:
+
+  With Likes table (1 row for each like) and w/o matches table:
+    user = User.first
+    others_users_user_has_matched_with = User.joins(:likes).where(likes: {likee_id: user.id}), match: true})
+
+    POSSIBLE: user.likees
+    POSSIBLE: user.inverse_likees
+    POSSIBLE: user.matches == others_users_user_has_matched_with
+
+
+  With Likes table (1 row for each like) and a Matches table:
+    user = User.first
+    Match.where('user_id_1 = ? OR user_id_2 = ?', user.id, user.id)
+
+    TODO: determine what is bossble from Querying Goals above
+
+
+  With Likes Table (both likes in same row) and w/o matches table
+    user_id: int
+    likee_id: int
+    match: boolean
+
+    @user_matches = Like.where('user_id = ? OR likee_id = ? AND match = ?', @user.id, true)
+
+    @users_ive_matched_with = User.joins(:likes).
+                                where('likes.user_id = ? OR likes.likee_id = ? AND likes.match = ?', @user.id, @user.id, true).
+                                where('users.id is NOT ?', @user.id)
+
+    TODO: determine what is bossble from Querying Goals above
+
+
+
 START -- tentative
 
 Pitch flow:
