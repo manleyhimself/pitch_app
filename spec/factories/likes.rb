@@ -7,6 +7,8 @@
 #  likee_id   :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  match      :boolean          default("f")
+#  match_time :datetime
 #
 # Indexes
 #
