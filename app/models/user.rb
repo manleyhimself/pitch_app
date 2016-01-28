@@ -23,5 +23,6 @@ class User < ActiveRecord::Base
   has_many :likees, through: :likes #users self has liked
   has_many :inverse_likes, class_name: "Like", foreign_key: "likee_id" 
   has_many :inverse_likees, through: :inverse_likes, source: :user #users who have liked self
+
   
 end

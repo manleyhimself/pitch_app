@@ -1,132 +1,35 @@
+TODO: figure out conversation logic and schema -- 
+    - Questions:
+      -- How do you know which pitches a gal has seen?
+          --- Maybe: add a :seen boolean to Conversations?
 
-Creating Likes:
+clas Conversation #would be inited when match is made
+  # locked :bool, default: false
+  # pitched :bool, default: false
 
-  With Likes table (1 row for each like) and w/o matches table: 3 queries total
-    1. a like is created - 1 query
-    2. search for other first like in a before_save - 1 query
-      old_like = Like.where......
-      if old_like.present?
-        new_like.match = true
-        old_like.update(match: true) - 1 query
-      else
-        #do nothing
-      end
+  has_many :messages
 
-  With Likes table (1 row for each like) and a Matches table: 3 queries total
-    1. a like is created - 1 query
-    2. search for other first like in a before_save - 1 query
-        old_like = Like.where
-        if old_like.exists?
-          Match.create - 1 query
-        end
+end
 
-  With Likes Table (both likes in same row) and w/o matches table: 2 queries total
-    1. check to see if like exists - 1 query
-    2a. if it doesn't
-      3a. Like.create(user_id: self.id, likee_id: other_user.id, match: false) - 1 query
-    2b. if it does (@like)
-      3b. @like = {user_id: other_user_id, likee_id: self.id, match: false}
-          @like.update(match: true) - 1 query
+#guy logic -- SAME AS GALS
+if @convo.locked? && !@convo.pitched?
+  #guy can only send one message
+elsif @convo.locked? && @convo.pitched?
+  #guy can do nothing
+elsif !@convo.locked?
+  #messages can be exchanged freely
+end
 
-
-Querying Goals -- user.likes, user.likees and user.matches:
-
-  With Likes table (1 row for each like) and w/o matches table:
-    user = User.first
-    others_users_user_has_matched_with = User.joins(:likes).where(likes: {likee_id: user.id}), match: true})
-
-    POSSIBLE: user.likees
-    POSSIBLE: user.inverse_likees
-    POSSIBLE: user.matches == others_users_user_has_matched_with
-
-
-  With Likes table (1 row for each like) and a Matches table:
-    user = User.first
-    Match.where('user_id_1 = ? OR user_id_2 = ?', user.id, user.id)
-
-    TODO: determine what is possible from Querying Goals above
-
-
-  With Likes Table (both likes in same row) and w/o matches table
-    user_id: int
-    likee_id: int
-    match: boolean
-
-    @user_matches = Like.where('user_id = ? OR likee_id = ? AND match = ?', @user.id, true)
-
-    @users_ive_matched_with = User.joins(:likes).
-                                where('likes.user_id = ? OR likes.likee_id = ? AND likes.match = ?', @user.id, @user.id, true).
-                                where('users.id is NOT ?', @user.id)
-
-    TODO: determine what is possible from Querying Goals above
-
-
-
-START -- tentative
-
-Pitch flow:
-1. Match made
-2. Guy can send a pitch
-3. Then he can't send anymore messages
-4a. girl sends one message
-  5a. conversation is unlocked, guy can send more messaages
-4b. girl ignroes/delets message/pitch,
-  5b. conversation remains locked or is deleted
-
-
-class Conversation
-  locked -> :bool
-  pitch -> :bool
-
-  # has_many :messages
-
+#gal logic -- SAME AS GIRLS
+if @convo.locked? && !@convo.pitched?
+ #gal knows nothing
+elsif @convo.locked? && @convo.pitched?
+  #girl is notified of new pitch
+elsif !@convo.locked?
+  #messages can be exchanged freely
 end
 
 class Message
-  user_1_id
-  user_2_id
+  belongs_to :user
+  belongs_to :conversation
 end
-
-class Pitch
-
-end
-
-END -- tentative
-
-
-START -- solid
-
-
-Matches ->
-
-gal_user_id :foreign_key
-guy_user_id :foreign_key
-
-
-class Match
-
-end
-
-END -- solid
-
-#Notes
-  -after like is created, if inverse_like.present? inform users of match
-    --We should minimize these queries:
-      ---1. Create like
-          --Match might be created
-      ---2. Try to find match?
-      ---perhaps like create could return a match (to minimize queries), of course, this might be bad practice
-  -thinking ahead: there should be a flag on matches, to know if a user has already seen it (that way we know if we should put it in their feed)
-
-
-#To bring up
-  -Likes table
-    -General issues
-      -Associations aren't super descriptive
-    -user_id ==likes==> likee_id
-      -Is user_id indescript?
-    -Maybe user_id and target_id
-      -User being the person who 'liked'
-      -target being the person who is the target of the like
-  -Photos table
-    -Is main_photo? needed? Would that just be the photo in position 1?
