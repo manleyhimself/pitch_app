@@ -44,7 +44,7 @@ Querying Goals -- user.likes, user.likees and user.matches:
     user = User.first
     Match.where('user_id_1 = ? OR user_id_2 = ?', user.id, user.id)
 
-    TODO: determine what is bossble from Querying Goals above
+    TODO: determine what is possible from Querying Goals above
 
 
   With Likes Table (both likes in same row) and w/o matches table
@@ -58,7 +58,7 @@ Querying Goals -- user.likes, user.likees and user.matches:
                                 where('likes.user_id = ? OR likes.likee_id = ? AND likes.match = ?', @user.id, @user.id, true).
                                 where('users.id is NOT ?', @user.id)
 
-    TODO: determine what is bossble from Querying Goals above
+    TODO: determine what is possible from Querying Goals above
 
 
 
