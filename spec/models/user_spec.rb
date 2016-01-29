@@ -33,14 +33,14 @@ RSpec.describe User, type: :model do
         expect(base_user.likes.first).to eq(base_like)
       end
 
-      it 'returns likes when the user\'s id is set to likes.likee_id and matches is true' do
+      it 'returns likes when the user\'s id is set to likes.likee_id and likes.match is true' do
         base_like.update_attributes(match: true)
 
         expect(target_user.likes.length).to eq(1)
         expect(target_user.likes.first).to eq(base_like)
       end
 
-      it 'will not return likes when the user\'s id is set to likes.likee_id and matches is false' do
+      it 'will not return likes when the user\'s id is set to likes.likee_id and likes.match is false' do
         base_like.update_attributes(match: false)
 
         expect(target_user.likes.length).to eq(0)
@@ -69,15 +69,77 @@ RSpec.describe User, type: :model do
 
     describe 'return the users that a user has liked' do 
       it 'returns users through likes.likee_id where likes.user_id is the user\'s id' do
+        expect(base_user.likees.length).to eq(1)
+        expect(base_user.likees.first).to eq(target_user)
+      end 
+
+      it 'returns users through likes.user_id where likes.likee_id is the user\'s id and likes.match is true' do
+        base_like.update_attributes(match: true)
+
+        expect(target_user.likees.length).to eq(1)
+        expect(target_user.likees.first).to eq(base_user)
+      end
+
+      it 'returns nil when likes.likee_id is the user\'s id and likes.match is false' do
+        base_like.update_attributes(match: false)
+
+        expect(target_user.likees.length).to eq(0)
       end
     end
 
 
-    it 'returns users who have liked it' do
+    describe 'return users who have liked a user' do
+
+      it 'returns users through likes.user_id where likes.likee_id is the user\'s id' do 
+        expect(target_user.inverse_likees.length).to eq(1)
+        expect(target_user.inverse_likees.first).to eq(base_user)
+      end
+
+      it 'returns users through likes.likee_id where likes.user_id is the user\'s id and likes.match is true' do 
+        base_like.update_attributes(match: true)
+
+        expect(base_user.inverse_likees.length).to eq(1)
+        expect(base_user.inverse_likees.first).to eq(target_user)
+      end
+
+      it 'returns nil when likes.user_id is the user\'s id and likes.match is false' do 
+        base_like.update_attributes(match: false)
+
+        expect(base_user.inverse_likees.length).to eq(0)
+      end
+
     end
 
-    it 'returns matches' do 
+    describe 'returns users that user has matched with' do 
+      
+      it 'returns users through likes.likee_id where likes.user_id is the user\'s id, and match is true'
+        base_like.update_attributes(match: true)
+
+        expect(base_user.matches.length).to eq(1)
+        expect(base_user.matches.first).to eq(target_user)
+      end    
+
+      it 'returns users through likes.user_id where likes.likee_id is the user\'s id, and match is true'
+        base_like.update_attributes(match: true)
+
+        expect(target_user.matches.length).to eq(1)
+        expect(target_user.matches.first).to eq(base_user)
+      end 
+
+      it 'returns nil when likes.user_id is the user\'s id, and match is false'
+        base_like.update_attributes(match: false)
+
+        expect(base_user.matches.length).to eq(0)
+      end
+
+      it 'returns nil when likes.likee_id is the user\'s id, and match is false'
+        base_like.update_attributes(match: false)
+
+        expect(target_user.matches.length).to eq(0)
+      end
+
     end
+
   end
 
 end
