@@ -112,27 +112,27 @@ RSpec.describe User, type: :model do
 
     describe 'returns users that user has matched with' do 
       
-      it 'returns users through likes.likee_id where likes.user_id is the user\'s id, and match is true'
+      it 'returns users through likes.likee_id where likes.user_id is the user\'s id, and match is true' do
         base_like.update_attributes(match: true)
 
         expect(base_user.matches.length).to eq(1)
         expect(base_user.matches.first).to eq(target_user)
       end    
 
-      it 'returns users through likes.user_id where likes.likee_id is the user\'s id, and match is true'
+      it 'returns users through likes.user_id where likes.likee_id is the user\'s id, and match is true' do
         base_like.update_attributes(match: true)
 
         expect(target_user.matches.length).to eq(1)
         expect(target_user.matches.first).to eq(base_user)
       end 
 
-      it 'returns nil when likes.user_id is the user\'s id, and match is false'
+      it 'returns nil when likes.user_id is the user\'s id, and match is false' do
         base_like.update_attributes(match: false)
 
         expect(base_user.matches.length).to eq(0)
       end
 
-      it 'returns nil when likes.likee_id is the user\'s id, and match is false'
+      it 'returns nil when likes.likee_id is the user\'s id, and match is false' do
         base_like.update_attributes(match: false)
 
         expect(target_user.matches.length).to eq(0)
