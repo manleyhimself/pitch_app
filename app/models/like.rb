@@ -18,7 +18,6 @@
 
 class Like < ActiveRecord::Base
 
-  belongs_to :user
-  belongs_to :likee, class_name: "User"
+  # TODO: build custom associations with, similar to desigin in user model's
   
 end

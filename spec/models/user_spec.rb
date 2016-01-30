@@ -20,12 +20,12 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  let(:user) { FactoryGirl.create(:user) }
+  let!(:user) { FactoryGirl.create(:user) }
 
   describe 'single-row like and match associations' do
-    let(:base_user) { FactoryGirl.create(:user) }
-    let(:target_user) { FactoryGirl.create(:user) }
-    let(:base_like) { FactoryGirl.create(:like, user_id: base_user.id, likee_id: target_user.id) }
+    let!(:base_user) { FactoryGirl.create(:user) }
+    let!(:target_user) { FactoryGirl.create(:user) }
+    let!(:base_like) { FactoryGirl.create(:like, user_id: base_user.id, likee_id: target_user.id) }
 
     describe 'return the likes that indicate a user has liked another user' do 
       it 'returns likes where the user\'s id is set to likes.user_id' do
