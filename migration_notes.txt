@@ -2,6 +2,7 @@ TODO: figure out conversation logic and schema --
     - Questions:
       -- How do you know which pitches a gal has seen?
           --- Maybe: add a :seen boolean to Conversations?
+      -- How are conversations associated with users?
 
 clas Conversation #would be inited when match is made
   # locked :bool, default: false
