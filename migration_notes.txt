@@ -1,41 +1,86 @@
-TODO: figure out conversation logic and schema -- 
-    - Questions:
-      -- How do you know which pitches a gal has seen?
-          --- Maybe: add a :seen boolean to Conversations?
-      -- How are conversations associated with users?
+classs Match
+  :pitcher_id #always male in heterosexual matches
+  :pitchee_id #always female in heterosexual matches
+  :pitched
+  :pitcher_seen
+  :pitchee_seen
 
-clas Conversation #would be inited when match is made
-  # locked :bool, default: false
-  # pitched :bool, default: false
+  belongs_to :pitcher, class: User
+  belongs_to :pitchee, class: User
 
   has_many :messages
-
-end
-
-#guy logic -- SAME AS GALS
-if @convo.locked? && !@convo.pitched?
-  #guy can only send one message
-elsif @convo.locked? && @convo.pitched?
-  #guy can do nothing
-elsif !@convo.locked?
-  #messages can be exchanged freely
-end
-
-#gal logic -- SAME AS GIRLS
-if @convo.locked? && !@convo.pitched?
- #gal knows nothing
-elsif @convo.locked? && @convo.pitched?
-  #girl is notified of new pitch
-elsif !@convo.locked?
-  #messages can be exchanged freely
 end
 
 class Message
   belongs_to :user
-  belongs_to :conversation
+  belongs_to :match
 end
 
-====================
+#feed / inbox
+  1. query for matches if hetero-male
+    --feed:
+      --- Match.where(pitcher_seen: false)
+    --inbox:
+      --- Shows all matches, uses :pitcher_seen, :pitched, and :locked attributes for UI/aesthetic variation
+  2. query for pitches if hetero-female
+    --feed:
+      --- Match.where(pitchee_seen: false, pitched: true)
+    --inbox:
+      --- Shows all matches.where(pitched: true), uses :pitchee_seen and :locked(seen but not responded to yet) for UI/aesthetic variation
+  3. query for either if homosexual
+    --feed
+      --- TODO: How to show matches you haven't seen?
 
-Check out the images table, there are two rows with '?' in them. 
+#match creation
+  1. hetero match 
+    -- look at gender of both users and sexual orientation to determine this
+    1. initial attribute values:
+      -- pitcher_seen: false
+      -- locked: true
+      -- pitched: false
+      -- pitchee_seen: false
+    2. sees match
+      -- @match.update(pitcher_seen: true)
+    3. the guy can pitch, convo is locked, can't say anything else
+      -- @match.update(pitched: true)
+    4. girl learns about pitch
+      -- @match.update(pitchee_seen: true)
+    5a. girl responds, unlocks convo
+      -- @match.update(locked: false)
+    5b. girl deletes? 
+      -- match is deleted?
+
+
+  2. homo match
+    -- look at gender of both users and sexual orientation to determine this
+    1. initial attribute values:
+      -- pitcher_seen: false
+      -- locked: true
+      -- pitched: false
+      -- pitchee_seen: false
+    2. locked until one person pitches, and other person responds (or pitches)
+    3. TODO: what's next?
+
+
+# Potential logic for setting match UI for various match states
+  #guy logic -- SAME AS GALS
+  if @convo.locked? && !@convo.pitched?
+    #guy can only send one message
+  elsif @convo.locked? && @convo.pitched?
+    #guy can do nothing
+  elsif !@convo.locked?
+    #messages can be exchanged freely
+  end
+
+  #gal logic -- SAME AS GIRLS
+  if @convo.locked? && !@convo.pitched?
+   #gal knows nothing
+  elsif @convo.locked? && @convo.pitched?
+    #girl is notified of new pitch
+  elsif !@convo.locked?
+    #messages can be exchanged freely
+  end
+
+
+
 
