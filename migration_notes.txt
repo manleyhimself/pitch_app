@@ -37,4 +37,5 @@ end
 
 ====================
 
+Check out the images table, there are two rows with '?' in them. 
 
