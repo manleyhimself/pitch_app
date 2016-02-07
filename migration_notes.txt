@@ -1,50 +1,92 @@
 classs Match
-  :pitcher_id #always male in heterosexual matches
-  :pitchee_id #always female in heterosexual matches
-  :pitched
-  :pitcher_seen
-  :pitchee_seen
-
-  belongs_to :pitcher, class: User
-  belongs_to :pitchee, class: User
+  :user_1_id
+  :user_2_id
+  :user_1_seen
+  :user_2_seen
+  :pitcher_id
+  :pitch_seen
+  :locked
 
   has_many :messages
+
+  def self.seen user_id
+    user_seen_query(user_id, true)
+  end
+
+  def self.un_seen user_id
+    user_seen_query(user_id, false)
+  end
+
+  def pitched?
+    pitcher_id.present?
+  end
+
+  def seen! user_id
+    self.send("#{foreign_prefix(user_id)}_seen"=, true)
+    self.save
+  end
+
+  def seen? user_id
+    self.send("#{foreign_prefix(user_id)}_seen?")
+  end
+
+  private
+
+  def self.user_seen_query user_id, seen_bool
+    where("(user_1_id = ? AND user_1_seen = ?) OR (user_2_id = ? AND user_2_seen = ?)", user_id, seen_bool, user_id, seen_bool)
+  end
+
+  def foreign_prefix user_id
+    user_1_id == user_id ? "user_1" : "user_2"
+  end
 end
 
-class Message
-  belongs_to :user
-  belongs_to :match
+class User
+  
+  def matches
+    Match.where("user_1_id = ? OR user_2_id = ?", id, id)
+  end
+
 end
 
-#feed / inbox
+#feed / inbox 
+  -- NOTE: below assumes locked matches are deleted once sexual orientation is changed (unlocked matches from previous sexual orientations WILL still be in inbox)
   1. query for matches if hetero-male
     --feed:
-      --- Match.where(pitcher_seen: false)
+      --- Match.un_seen(user.id) 
     --inbox:
-      --- Shows all matches, uses :pitcher_seen, :pitched, and :locked attributes for UI/aesthetic variation
+      --- Shows user.matches, uses match.seen?(user.id), match.pitched?, and :locked attribute for UI/aesthetic variation
   2. query for pitches if hetero-female
     --feed:
-      --- Match.where(pitchee_seen: false, pitched: true)
+      --- Match.un_seen(user.id).where('pitcher_id != ?')
     --inbox:
-      --- Shows all matches.where(pitched: true), uses :pitchee_seen and :locked(seen but not responded to yet) for UI/aesthetic variation
-  3. query for either if homosexual
-    --feed
-      --- TODO: How to show matches you haven't seen?
+      --- Shows all user.matches.where('pitcher_id != ?'), uses match.seen?(user.id) and :locked(seen but not responded to yet) for UI/aesthetic variation
+  3. query for matches if homo-male
+    --feed:
+      --- Match.un_seen OR (pitcher_id != user.id AND pitcher_id != nil AND pitch_seen == false)
+    --inbox:
+      --- Shows user.matches, uses match.seen?(user.id), match.pitched?, and :pitcher_id, :pitch_seen and :locked attributes for UI/aesthetic variation
+ 4. query for matches if homo-female
+  --feed:
+    --- Match.un_seen(user.id) OR (pitcher_id != user.id AND pitcher_id != nil AND pitch_seen == false )
+  --inbox:
+     --- Shows user.matches, uses match.seen?(user.id), match.pitched?, and :pitcher_id, :pitch_seen and :locked attributes for UI/aesthetic variation
 
 #match creation
   1. hetero match 
     -- look at gender of both users and sexual orientation to determine this
-    1. initial attribute values:
-      -- pitcher_seen: false
+    1. initial attribute values: (:user_1_id and :user_2_id set arbitrarily)
+      -- user_1_seen: false
       -- locked: true
-      -- pitched: false
-      -- pitchee_seen: false
+      -- pitch_seen: false
+      -- user_2_seen: false
     2. sees match
-      -- @match.update(pitcher_seen: true)
+      -- @match.seen!(guy.id)
     3. the guy can pitch, convo is locked, can't say anything else
-      -- @match.update(pitched: true)
+      -- @match.update(pitcher_id: guy.id)
     4. girl learns about pitch
-      -- @match.update(pitchee_seen: true)
+      -- @match.seen!(girl.id)
+      -- @match.update(pitch_seen: true)
     5a. girl responds, unlocks convo
       -- @match.update(locked: false)
     5b. girl deletes? 
@@ -53,13 +95,25 @@ end
 
   2. homo match
     -- look at gender of both users and sexual orientation to determine this
-    1. initial attribute values:
-      -- pitcher_seen: false
-      -- locked: true
-      -- pitched: false
-      -- pitchee_seen: false
-    2. locked until one person pitches, and other person responds (or pitches)
-    3. TODO: what's next?
+    1. initial attribute values: (:user_1_id and :user_2_id set arbitrarily)
+      -- user_1_seen: false
+      -- locked: true (locked until one person pitches, and other person responds)
+      -- pitch_seen: false
+      -- user_2_seen: false
+    2. sees match
+      -- @match.seen!(user_1.id)
+      -- @match.seen!(user_2.id)
+    3. either can pitch, convo is locked, can't say anything else
+      -- @match.update(pitcher_id: user_1.id)
+    4. someone sees pitch
+      -- @match.update(pitch_seen: true)
+    4. pitchee responds to pitch
+      -- @match.update(locked: false)
+
+
+=====================================================================================
+
+
 
 
 # Potential logic for setting match UI for various match states
