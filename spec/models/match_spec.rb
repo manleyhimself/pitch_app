@@ -30,15 +30,40 @@ RSpec.describe Match, type: :model do
   
   describe 'class methods' do 
 
-    it 'returns seen matches for a specific user_id' do
-      match.update(user_1_seen: true)
-      expect(Match.seen(user_1.id).first).to eq(match)
+    describe 'self.seen' do
+      it 'returns seen matches for a specific user_id' do
+        match.update(user_1_seen: true)
+        expect(Match.seen(user_1.id).first).to eq(match)
+      end
+    end
+    
+    describe 'self.unseen' do
+      it 'returns unseen matches for a specific user_id' do
+        expect(Match.unseen(user_1.id).first).to eq(match)
+      end
     end
 
-    it 'returns unseen matches for a specific user_id' do
-      expect(Match.un_seen(user_1.id).first).to eq(match)
-    end
-
+    describe 'self.unseen_and_pitches' do
+      it 'returns unseen matches for a specific user_id' do
+        expect(Match.unseen_and_pitches(user_1.id).first).to eq(match)
+      end
+      it 'returns a match where a user has seen the match, but not the pitch and the user is not the pitcher' do
+        match.update(user_1_seen: true, user_2_seen: true, pitcher_id: user_2.id)
+        expect(Match.unseen_and_pitches(user_1.id).first).to eq(match)
+      end
+      it 'returns distinct matches where a user has not seen the match or the pitch and the user is not the pitcher' do
+        match.update(user_1_seen: false, user_2_seen: true, pitcher_id: user_2.id)
+        expect(Match.unseen_and_pitches(user_1.id).length).to eq(1)
+      end
+      it 'does not return matches where a user has seen the match and the user is the pitcher' do
+        match.update(user_1_seen: true, user_2_seen: true, pitcher_id: user_1.id)
+        expect(Match.unseen_and_pitches(user_1.id).length).to eq(0)
+      end
+      it 'does not return matches where a user has seen the match and the pitch and the user is not the pitcher' do
+        match.update(user_1_seen: true, user_2_seen: true, pitcher_id: user_2.id, pitch_seen: true)
+        expect(Match.unseen_and_pitches(user_1.id).length).to eq(0)
+      end
+    end 
   end
 
   describe 'instance methods' do
