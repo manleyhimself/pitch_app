@@ -31,12 +31,31 @@ RSpec.describe Match, type: :model do
   describe 'class methods' do 
 
     it 'returns seen matches for a specific user_id' do
-      match.update(user_1_seen: true, user_2_seen: false)
-      expect()
+      match.update(user_1_seen: true)
+      expect(Match.seen(user_1.id).first).to eq(match)
+    end
+
+    it 'returns unseen matches for a specific user_id' do
+      expect(Match.un_seen(user_1.id).first).to eq(match)
     end
 
   end
 
+  describe 'instance methods' do
+
+    it 'given a user_id it updates the appropriate user_seen boolean' do
+      match.seen!(user_1.id)
+      expect(match.user_1_seen).to eq(true)
+      expect(match.user_2_seen).to eq(false)
+    end
+
+    it 'returns a boolean indicating that the appropriate user has seen a match' do
+      match.update(user_1_seen: true)
+      expect(match.seen?(user_1.id)).to eq(true)
+      expect(match.seen?(user_2.id)).to eq(false)
+    end
+
+  end
 
 end
 
