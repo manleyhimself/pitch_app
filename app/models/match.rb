@@ -32,7 +32,7 @@ class Match < ActiveRecord::Base
   end
 
   def self.unseen_and_pitches user_id
-    where("#{user_seen_query_str} OR (pitcher_id != ? AND pitcher_id != ? AND pitch_seen = ?)", user_id, false, user_id, false, user_id, nil, false)
+    where("#{user_seen_query_str} OR (pitcher_id != ? AND pitcher_id IS NOT NULL AND pitch_seen = ?)", user_id, false, user_id, false, user_id, false)
   end
 
   def pitched?
