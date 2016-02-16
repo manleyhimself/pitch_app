@@ -7,7 +7,7 @@ classs Match
   :pitch_seen
   :locked
 
-  has_many :messages
+  #has_many :messages
 
   def self.seen user_id
     user_seen_query(user_id, true)
@@ -17,12 +17,16 @@ classs Match
     user_seen_query(user_id, false)
   end
 
+  def self.unseen_and_pitches user_id
+    where("#{user_seen_query_str}" OR (pitcher_id != ? AND pitcher_id != ? AND pitch_seen = ?)", user_id, false, user_id, false, user_id, nil, false)
+  end
+
   def pitched?
     pitcher_id.present?
   end
 
   def seen! user_id
-    self.send("#{foreign_prefix(user_id)}_seen"=, true)
+    self.send("#{foreign_prefix(user_id)}_seen=", true)
     self.save
   end
 
@@ -33,7 +37,11 @@ classs Match
   private
 
   def self.user_seen_query user_id, seen_bool
-    where("(user_1_id = ? AND user_1_seen = ?) OR (user_2_id = ? AND user_2_seen = ?)", user_id, seen_bool, user_id, seen_bool)
+    where("#{user_seen_query_str}", user_id, seen_bool, user_id, seen_bool)
+  end
+
+  def self.user_seen_query_str
+    "(user_1_id = ? AND user_1_seen = ?) OR (user_2_id = ? AND user_2_seen = ?)"
   end
 
   def foreign_prefix user_id
@@ -58,17 +66,17 @@ end
       --- Shows user.matches, uses match.seen?(user.id), match.pitched?, and :locked attribute for UI/aesthetic variation
   2. query for pitches if hetero-female
     --feed:
-      --- Match.un_seen(user.id).where('pitcher_id != ?')
+      --- Match.un_seen(user.id).where('pitcher_id != ?', nil)
     --inbox:
-      --- Shows all user.matches.where('pitcher_id != ?'), uses match.seen?(user.id) and :locked(seen but not responded to yet) for UI/aesthetic variation
+      --- Shows all user.matches.where('pitcher_id != ?', nil), uses match.seen?(user.id) and :locked(seen but not responded to yet) for UI/aesthetic variation
   3. query for matches if homo-male
     --feed:
-      --- Match.un_seen OR (pitcher_id != user.id AND pitcher_id != nil AND pitch_seen == false)
+      --- Match.unseen_and_pitches(user_id)
     --inbox:
       --- Shows user.matches, uses match.seen?(user.id), match.pitched?, and :pitcher_id, :pitch_seen and :locked attributes for UI/aesthetic variation
  4. query for matches if homo-female
   --feed:
-    --- Match.un_seen(user.id) OR (pitcher_id != user.id AND pitcher_id != nil AND pitch_seen == false )
+    --- Match.unseen_and_pitches(user_id)
   --inbox:
      --- Shows user.matches, uses match.seen?(user.id), match.pitched?, and :pitcher_id, :pitch_seen and :locked attributes for UI/aesthetic variation
 
