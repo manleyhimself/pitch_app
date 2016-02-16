@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160216220400) do
+ActiveRecord::Schema.define(version: 20160216222313) do
 
   create_table "images", force: :cascade do |t|
     t.integer  "user_id"
@@ -40,13 +40,13 @@ ActiveRecord::Schema.define(version: 20160216220400) do
   create_table "matches", force: :cascade do |t|
     t.integer  "user_1_id"
     t.integer  "user_2_id"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.boolean  "user_1_seen"
-    t.boolean  "user_2_seen"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.boolean  "user_1_seen",   default: false
+    t.boolean  "user_2_seen",   default: false
     t.integer  "pitcher_id_id"
-    t.boolean  "pitch_seen"
-    t.boolean  "locked"
+    t.boolean  "pitch_seen",    default: false
+    t.boolean  "locked",        default: true
   end
 
   add_index "matches", ["pitcher_id_id"], name: "index_matches_on_pitcher_id_id"

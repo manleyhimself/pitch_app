@@ -7,11 +7,11 @@
 #  user_2_id     :integer
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
-#  user_1_seen   :boolean
-#  user_2_seen   :boolean
+#  user_1_seen   :boolean          default("f")
+#  user_2_seen   :boolean          default("f")
 #  pitcher_id_id :integer
-#  pitch_seen    :boolean
-#  locked        :boolean
+#  pitch_seen    :boolean          default("f")
+#  locked        :boolean          default("t")
 #
 # Indexes
 #
@@ -23,5 +23,28 @@
 require 'rails_helper'
 
 RSpec.describe Match, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+
+   let!(:user_1) { FactoryGirl.create(:user) }
+   let!(:user_2) { FactoryGirl.create(:user) }
+   let!(:match) { FactoryGirl.create(:match, user_1_id: user_1.id, user_2_id: user_2.id) }
+  
+  describe 'class methods' do 
+
+    it 'returns seen matches for a specific user_id' do
+      match.update(user_1_seen: true, user_2_seen: false)
+      expect()
+    end
+
+  end
+
+
 end
+
+
+
+
+
+
+
+
+
