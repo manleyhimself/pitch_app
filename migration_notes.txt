@@ -1,62 +1,3 @@
-classs Match
-  :user_1_id
-  :user_2_id
-  :user_1_seen
-  :user_2_seen
-  :pitcher_id
-  :pitch_seen
-  :locked
-
-  #has_many :messages
-
-  def self.seen user_id
-    user_seen_query(user_id, true)
-  end
-
-  def self.un_seen user_id
-    user_seen_query(user_id, false)
-  end
-
-  def self.unseen_and_pitches user_id
-    where("#{user_seen_query_str}" OR (pitcher_id != ? AND pitcher_id != ? AND pitch_seen = ?)", user_id, false, user_id, false, user_id, nil, false)
-  end
-
-  def pitched?
-    pitcher_id.present?
-  end
-
-  def seen! user_id
-    self.send("#{foreign_prefix(user_id)}_seen=", true)
-    self.save
-  end
-
-  def seen? user_id
-    self.send("#{foreign_prefix(user_id)}_seen?")
-  end
-
-  private
-
-  def self.user_seen_query user_id, seen_bool
-    where("#{user_seen_query_str}", user_id, seen_bool, user_id, seen_bool)
-  end
-
-  def self.user_seen_query_str
-    "(user_1_id = ? AND user_1_seen = ?) OR (user_2_id = ? AND user_2_seen = ?)"
-  end
-
-  def foreign_prefix user_id
-    user_1_id == user_id ? "user_1" : "user_2"
-  end
-end
-
-class User
-  
-  def matches
-    Match.where("user_1_id = ? OR user_2_id = ?", id, id)
-  end
-
-end
-
 #feed / inbox 
   -- NOTE: below assumes locked matches are deleted once sexual orientation is changed (unlocked matches from previous sexual orientations WILL still be in inbox)
   1. query for matches if hetero-male
@@ -115,6 +56,7 @@ end
       -- @match.update(pitcher_id: user_1.id)
     4. someone sees pitch
       -- @match.update(pitch_seen: true)
+      -- might also mark match as seen now
     4. pitchee responds to pitch
       -- @match.update(locked: false)
 

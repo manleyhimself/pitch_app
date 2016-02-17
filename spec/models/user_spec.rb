@@ -115,31 +115,40 @@ RSpec.describe User, type: :model do
       it 'returns users through likes.likee_id where likes.user_id is the user\'s id, and match is true' do
         base_like.update_attributes(match: true)
 
-        expect(base_user.matches.length).to eq(1)
-        expect(base_user.matches.first).to eq(target_user)
+        expect(base_user.matched_users.length).to eq(1)
+        expect(base_user.matched_users.first).to eq(target_user)
       end    
 
       it 'returns users through likes.user_id where likes.likee_id is the user\'s id, and match is true' do
         base_like.update_attributes(match: true)
 
-        expect(target_user.matches.length).to eq(1)
-        expect(target_user.matches.first).to eq(base_user)
+        expect(target_user.matched_users.length).to eq(1)
+        expect(target_user.matched_users.first).to eq(base_user)
       end 
 
       it 'returns nil when likes.user_id is the user\'s id, and match is false' do
         base_like.update_attributes(match: false)
 
-        expect(base_user.matches.length).to eq(0)
+        expect(base_user.matched_users.length).to eq(0)
       end
 
       it 'returns nil when likes.likee_id is the user\'s id, and match is false' do
         base_like.update_attributes(match: false)
 
-        expect(target_user.matches.length).to eq(0)
+        expect(target_user.matched_users.length).to eq(0)
       end
 
     end
 
+    describe 'instance methods' do
+      describe '.matches' do
+        let!(:match) { FactoryGirl.create(:match, user_1_id: base_user.id, user_2_id: target_user.id) }
+
+        it 'returns matches where user\'s id is set as user_1_id or user_2_id' do 
+          expect(base_user.matches.first).to eq(match)
+        end
+      end
+    end
   end
 
 end

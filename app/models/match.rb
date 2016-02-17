@@ -39,6 +39,10 @@ class Match < ActiveRecord::Base
     pitcher_id.present?
   end
 
+  def pitcher? user_id
+    user_id == pitcher_id
+  end
+
   def seen! user_id
     self.send("#{foreign_prefix(user_id)}_seen=", true)
     self.save

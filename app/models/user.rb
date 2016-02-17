@@ -18,6 +18,11 @@
 #
 
 class User < ActiveRecord::Base
+
+  def matches
+    Match.where("user_1_id = ? OR user_2_id = ?", id, id)
+  end
+
   def likes
     Like.where('(user_id = ?) OR (likee_id = ? AND match = ?)', id, id, true)
   end
@@ -34,7 +39,7 @@ class User < ActiveRecord::Base
     joins_likes.where('(likee_likes.likee_id = ?) OR (liker_likes.user_id = ? AND liker_likes.match = ?)', id, id, true)
   end
 
-  def matches
+  def matched_users
     joins_likes.where('(liker_likes.user_id = ? AND liker_likes.match = ?) OR (likee_likes.likee_id = ? AND likee_likes.match = ?)', id, true, id, true)
   end
   

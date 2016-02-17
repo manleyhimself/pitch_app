@@ -28,6 +28,7 @@ class Like < ActiveRecord::Base
 
     if inverse_like.present?
       inverse_like.update_attributes(match: true, match_time: Time.now)
+      #TODO create Match
       inverse_like
     else
       create(user_id: base_user_id, likee_id: target_user_id)

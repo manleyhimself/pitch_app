@@ -24,8 +24,8 @@ require 'rails_helper'
 
 RSpec.describe Match, type: :model do
 
-   let!(:user_1) { FactoryGirl.create(:user) }
-   let!(:user_2) { FactoryGirl.create(:user) }
+   let(:user_1) { FactoryGirl.create(:user) }
+   let(:user_2) { FactoryGirl.create(:user) }
    let!(:match) { FactoryGirl.create(:match, user_1_id: user_1.id, user_2_id: user_2.id) }
   
   describe 'class methods' do 
@@ -48,11 +48,11 @@ RSpec.describe Match, type: :model do
         expect(Match.unseen_and_pitches(user_1.id).first).to eq(match)
       end
       it 'returns a match where a user has seen the match, but not the pitch and the user is not the pitcher' do
-        match.update(user_1_seen: true, user_2_seen: true, pitcher_id: user_2.id)
+        match.update(user_1_seen: true, pitcher_id: user_2.id)
         expect(Match.unseen_and_pitches(user_1.id).first).to eq(match)
       end
       it 'returns distinct matches where a user has not seen the match or the pitch and the user is not the pitcher' do
-        match.update(user_1_seen: false, user_2_seen: true, pitcher_id: user_2.id)
+        match.update(user_1_seen: false, pitcher_id: user_2.id)
         expect(Match.unseen_and_pitches(user_1.id).length).to eq(1)
       end
       it 'does not return matches where a user has seen the match and the user is the pitcher' do
@@ -60,7 +60,7 @@ RSpec.describe Match, type: :model do
         expect(Match.unseen_and_pitches(user_1.id).length).to eq(0)
       end
       it 'does not return matches where a user has seen the match and the pitch and the user is not the pitcher' do
-        match.update(user_1_seen: true, user_2_seen: true, pitcher_id: user_2.id, pitch_seen: true)
+        match.update(user_1_seen: true, pitcher_id: user_2.id, pitch_seen: true)
         expect(Match.unseen_and_pitches(user_1.id).length).to eq(0)
       end
     end 
