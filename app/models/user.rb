@@ -21,9 +21,15 @@
 #
 
 class User < ActiveRecord::Base
-  
-  enum gender: [:male, :female]
-  enum interested_in: [:seeking_male, :seeking_female]
+
+  # gender/interested_in: 0 => male, 1 => female
+  # enum gender: [:male, :female]
+  # enum interested_in: [:seeking_male, :seeking_female]
+
+  acts_as_mappable :default_units => :miles,
+                   :default_formula => :sphere,
+                   :lat_column_name => :lat,
+                   :lng_column_name => :lng
 
   def matches
     Match.where("user_1_id = ? OR user_2_id = ?", id, id)
@@ -49,6 +55,14 @@ class User < ActiveRecord::Base
     joins_likes.where('(liker_likes.user_id = ? AND liker_likes.match = ?) OR (likee_likes.likee_id = ? AND likee_likes.match = ?)', id, true, id, true)
   end
   
+  def feed_users radius
+    
+    User.within(radius, origin: [lat, lng])
+    .where(interested_in: gender, gender: interested_in)
+    .where('id NOT IN (?)', self.likees.pluck(:id))
+    #user is not in my likees
+  end
+
   private
 
   def joins_likes

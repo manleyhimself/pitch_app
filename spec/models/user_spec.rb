@@ -154,16 +154,17 @@ RSpec.describe User, type: :model do
     end
 
     describe 'feed methods' do 
-      let!(:test_user) {base_user.update_attributes(lat: 40.887038, lng: -72.392294, interested_in: 1)}
+      let!(:test_user) {FactoryGirl.create(:user, gender: 0, interested_in: 1, lat: 40.887038, lng: -72.392294)}
       let!(:user_1) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.887028, lng: -72.392296) } # female, seeking_male, in radius
-      let!(:user_2) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.884054, lng: -72.392290) } # female, seeking_male, in radius
+      let!(:user_2) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.884054, lng: -72.392290) } # female, seeking_male, in radius, but like exists
       let!(:user_3) { FactoryGirl.create(:user, gender: 0, interested_in: 1, lat: 40.883054, lng: -72.392292) } # male, seeking_female, in radius
-      let!(:user_4) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.822691, lng: -72.545011) } # female, seeking_male, NOT in radius
+      let!(:user_4) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 41.954686, lng: -87.678657) } # female, seeking_male, NOT in radius
       let!(:user_5) { FactoryGirl.create(:user, gender: 1, interested_in: 1, lat: 40.887028, lng: -72.392296) } # female, seeking_female, in radius
-      let!(:user_6) { FactoryGirl.create(:user, gender: 0, interested_in: 0, lat: 40.887028, lng: -72.392296) } # male, seeking_male, in radius
+      let!(:user_6) { FactoryGirl.create(:user, gender: 0, interested_in: 0, lat: 40.887031, lng: -72.392296) } # male, seeking_male, in radius
+      let!(:some_like) { FactoryGirl.create(:like, user_id: test_user.id, likee_id: user_2.id) } # male, seeking_male, in radius
       describe 'feed_users' do
-        it 'only returns compatible users within a set radius' do 
-          expect(test_user.feed_users).to match_array(user_1, user_2)
+        it 'only returns compatible users within a set radius' do
+          expect(test_user.feed_users(5)).to match_array([user_1])
         end
       end
     end
