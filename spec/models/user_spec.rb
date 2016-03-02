@@ -154,7 +154,7 @@ RSpec.describe User, type: :model do
     end
 
     describe 'feed methods' do 
-      let!(:test_user) {base_user.update_attributes(lat: 40.887038, lng: -72.392294, interested_in: 1))}
+      let!(:test_user) {base_user.update_attributes(lat: 40.887038, lng: -72.392294, interested_in: 1)}
       let!(:user_1) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.887028, lng: -72.392296) } # female, seeking_male, in radius
       let!(:user_2) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.884054, lng: -72.392290) } # female, seeking_male, in radius
       let!(:user_3) { FactoryGirl.create(:user, gender: 0, interested_in: 1, lat: 40.883054, lng: -72.392292) } # male, seeking_female, in radius
