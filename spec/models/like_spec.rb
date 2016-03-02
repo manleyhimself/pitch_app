@@ -19,11 +19,11 @@
 require 'rails_helper'
 
 RSpec.describe Like, type: :model do
-  let!(:user) { FactoryGirl.create(:user) }
+  let!(:user) { FactoryGirl.create(:user, gender: 0) }
 
   describe 'user liking' do
-    let!(:base_user) { FactoryGirl.create(:user) }
-    let!(:target_user) { FactoryGirl.create(:user) }
+    let!(:base_user) { FactoryGirl.create(:user, gender: 0) }
+    let!(:target_user) { FactoryGirl.create(:user, gender: 1) }
 
     it 'creates a new like if the base user has not been liked by the target user' do
       before_like_count = Like.count

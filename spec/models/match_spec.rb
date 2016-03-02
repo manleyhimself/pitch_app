@@ -24,8 +24,8 @@ require 'rails_helper'
 
 RSpec.describe Match, type: :model do
 
-   let(:user_1) { FactoryGirl.create(:user) }
-   let(:user_2) { FactoryGirl.create(:user) }
+   let(:user_1) { FactoryGirl.create(:user, gender: 0) }
+   let(:user_2) { FactoryGirl.create(:user, gender: 1) }
    let!(:match) { FactoryGirl.create(:match, user_1_id: user_1.id, user_2_id: user_2.id) }
   
   describe 'class methods' do 

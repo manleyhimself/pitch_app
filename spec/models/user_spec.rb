@@ -23,11 +23,11 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  let!(:user) { FactoryGirl.create(:user) }
+  let!(:user) { FactoryGirl.create(:user, gender: 0) }
 
   describe 'single-row like and match associations' do
-    let!(:base_user) { FactoryGirl.create(:user) }
-    let!(:target_user) { FactoryGirl.create(:user) }
+    let!(:base_user) { FactoryGirl.create(:user, gender: 0) }
+    let!(:target_user) { FactoryGirl.create(:user, gender: 1) }
     let!(:base_like) { FactoryGirl.create(:like, user_id: base_user.id, likee_id: target_user.id) }
 
     describe 'return the likes that indicate a user has liked another user' do 
@@ -152,8 +152,22 @@ RSpec.describe User, type: :model do
         end
       end
     end
-  end
 
+    describe 'feed methods' do 
+      let!(:test_user) {base_user.update_attributes(lat: 40.887038, lng: -72.392294, interested_in: 1))}
+      let!(:user_1) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.887028, lng: -72.392296) } # female, seeking_male, in radius
+      let!(:user_2) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.884054, lng: -72.392290) } # female, seeking_male, in radius
+      let!(:user_3) { FactoryGirl.create(:user, gender: 0, interested_in: 1, lat: 40.883054, lng: -72.392292) } # male, seeking_female, in radius
+      let!(:user_4) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.822691, lng: -72.545011) } # female, seeking_male, NOT in radius
+      let!(:user_5) { FactoryGirl.create(:user, gender: 1, interested_in: 1, lat: 40.887028, lng: -72.392296) } # female, seeking_female, in radius
+      let!(:user_6) { FactoryGirl.create(:user, gender: 0, interested_in: 0, lat: 40.887028, lng: -72.392296) } # male, seeking_male, in radius
+      describe 'feed_users' do
+        it 'only returns compatible users within a set radius' do 
+          expect(test_user.feed_users).to match_array(user_1, user_2)
+        end
+      end
+    end
+  end
 end
 
 
