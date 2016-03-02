@@ -23,8 +23,8 @@
 class User < ActiveRecord::Base
 
   # gender/interested_in: 0 => male, 1 => female
-  # enum gender: [:male, :female]
-  # enum interested_in: [:seeking_male, :seeking_female]
+  enum gender: [:male, :female]
+  enum interested_in: [:seeking_male, :seeking_female]
 
   acts_as_mappable :default_units => :miles,
                    :default_formula => :sphere,
@@ -39,15 +39,15 @@ class User < ActiveRecord::Base
     Like.where('(user_id = ?) OR (likee_id = ? AND match = ?)', id, id, true)
   end
 
-  def likees # people you've liked
+  def likees # users you've liked
     joins_likes.where('(liker_likes.user_id = ?) OR (likee_likes.likee_id = ? AND likee_likes.match = ?)', id, id, true)
   end
 
-  def inverse_likes
+  def inverse_likes #users who like you
     Like.where('(likee_id = ?) OR (user_id = ? AND match = ?)', id, id, true)
   end
 
-  def inverse_likees # people who have liked you
+  def inverse_likees # users who have liked you
     joins_likes.where('(likee_likes.likee_id = ?) OR (liker_likes.user_id = ? AND liker_likes.match = ?)', id, id, true)
   end
 
@@ -56,11 +56,9 @@ class User < ActiveRecord::Base
   end
   
   def feed_users radius
-    
     User.within(radius, origin: [lat, lng])
-    .where(interested_in: gender, gender: interested_in)
+    .where(interested_in: User.genders[gender], gender: User.interested_ins[interested_in])
     .where('id NOT IN (?)', self.likees.pluck(:id))
-    #user is not in my likees
   end
 
   private
