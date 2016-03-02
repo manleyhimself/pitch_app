@@ -2,22 +2,28 @@
 #
 # Table name: users
 #
-#  id           :integer          not null, primary key
-#  first_name   :string
-#  last_name    :string
-#  full_name    :string
-#  gender       :string
-#  password     :string
-#  university   :string
-#  job_title    :string
-#  company_name :string
-#  blurb        :string
-#  birthday     :date
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
+#  id            :integer          not null, primary key
+#  first_name    :string
+#  last_name     :string
+#  full_name     :string
+#  gender        :integer
+#  password      :string
+#  university    :string
+#  job_title     :string
+#  company_name  :string
+#  blurb         :string
+#  birthday      :date
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  lat           :float
+#  lng           :float
+#  interested_in :integer
 #
 
 class User < ActiveRecord::Base
+  
+  enum gender: [:male, :female]
+  enum interested_in: [:seeking_male, :seeking_female]
 
   def matches
     Match.where("user_1_id = ? OR user_2_id = ?", id, id)
