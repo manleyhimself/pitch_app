@@ -165,6 +165,7 @@ RSpec.describe User, type: :model do
       let!(:like_1) { FactoryGirl.create(:like, user_id: test_user.id, likee_id: user_2.id) } 
       let!(:like_2) { FactoryGirl.create(:like, user_id: user_4.id, likee_id: test_user.id) } 
       let!(:like_3) { FactoryGirl.create(:like, user_id: user_5.id, likee_id: test_user.id) } 
+      
       describe 'feed_users' do
         it 'only returns compatible users within a set radius' do
           expect(test_user.feed_users(5)).to match_array([user_1])
@@ -173,7 +174,7 @@ RSpec.describe User, type: :model do
       describe 'sanitized_users' do
 
         it 'returns users that have liked a user, where a match does\'t exist' do
-          expect(test_user.sanitized_likees([555])).to match_array([user_4, user_5])
+          expect(test_user.sanitized_likees([])).to match_array([user_4, user_5])
         end
 
         it 'appropriately removes users who\'s ids are passsed into the method' do
@@ -182,7 +183,7 @@ RSpec.describe User, type: :model do
 
         it 'removes users from the query who are matched with a user' do 
           like_3.update_attributes(match: true)
-          expect(test_user.sanitized_likees([555])).to match_array([user_4])
+          expect(test_user.sanitized_likees([])).to match_array([user_4])
         end
 
       end

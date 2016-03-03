@@ -62,9 +62,11 @@ class User < ActiveRecord::Base
   end
 
   def sanitized_likees seen_this_session_ids # Users with likes where match=f and likee_seen_count < 3
-    #issue where empty seen_this_session_ids causes weird active record error
+    # issue where empty seen_this_session_ids array causes weird active record error
+    # potential fix using not, tests passing
+    # old query -> # .where('users.id NOT IN (?)', seen_this_session_ids)
     self.inverse_likees
-    .where('users.id NOT IN (?)', seen_this_session_ids)
+    .where.not(id: seen_this_session_ids)
     .where('likee_likes.match = ? AND likee_likes.likee_id = ? AND likee_likes.likee_seen_count < ?', false, id, 3)
   end
 
