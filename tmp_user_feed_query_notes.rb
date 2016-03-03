@@ -31,7 +31,7 @@ class FeedsController
 
                               #NOTE: query above this point should be in USER MODEL
 
-                              .randomize #made up function, look at docs for real one
+                              .shuffle(!) #from the docs
                               .limit(params[:random_limit])
                               .offset(params[:rand_offset])
 
