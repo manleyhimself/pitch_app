@@ -61,6 +61,12 @@ class User < ActiveRecord::Base
     .where('id NOT IN (?)', self.likees.pluck(:id))
   end
 
+  def sanitized_likes seen_this_session_ids # ie. likes without matches or without n amount of likee_seen_count
+    self.inverse_likees
+    .where('users.id NOT IN (?)', seen_this_session_ids)
+    .where('likee_likes.match = ? AND likee_likes.likee_id = ? AND likee_likes.likee_seen_count < ?', false, id, 3)
+  end
+  
   private
 
   def joins_likes

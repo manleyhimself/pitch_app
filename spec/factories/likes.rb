@@ -2,13 +2,14 @@
 #
 # Table name: likes
 #
-#  id         :integer          not null, primary key
-#  user_id    :integer
-#  likee_id   :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  match      :boolean          default("f")
-#  match_time :datetime
+#  id               :integer          not null, primary key
+#  user_id          :integer
+#  likee_id         :integer
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  match            :boolean          default("f")
+#  match_time       :datetime
+#  likee_seen_count :integer          default("0")
 #
 # Indexes
 #
