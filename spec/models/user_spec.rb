@@ -159,13 +159,32 @@ RSpec.describe User, type: :model do
       let!(:user_2) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 40.884054, lng: -72.392290) } # female, seeking_male, in radius, but like exists
       let!(:user_3) { FactoryGirl.create(:user, gender: 0, interested_in: 1, lat: 40.883054, lng: -72.392292) } # male, seeking_female, in radius
       let!(:user_4) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 41.954686, lng: -87.678657) } # female, seeking_male, NOT in radius
+      let!(:user_4) { FactoryGirl.create(:user, gender: 1, interested_in: 0, lat: 39.954686, lng: -87.678447) } # female, seeking_male, NOT in radius
       let!(:user_5) { FactoryGirl.create(:user, gender: 1, interested_in: 1, lat: 40.887028, lng: -72.392296) } # female, seeking_female, in radius
       let!(:user_6) { FactoryGirl.create(:user, gender: 0, interested_in: 0, lat: 40.887031, lng: -72.392296) } # male, seeking_male, in radius
-      let!(:some_like) { FactoryGirl.create(:like, user_id: test_user.id, likee_id: user_2.id) } # male, seeking_male, in radius
+      let!(:like_1) { FactoryGirl.create(:like, user_id: test_user.id, likee_id: user_2.id) } 
+      let!(:like_2) { FactoryGirl.create(:like, user_id: user_4.id, likee_id: test_user.id) } 
+      let!(:like_3) { FactoryGirl.create(:like, user_id: user_5.id, likee_id: test_user.id) } 
       describe 'feed_users' do
         it 'only returns compatible users within a set radius' do
           expect(test_user.feed_users(5)).to match_array([user_1])
         end
+      end
+      describe 'sanitized_users' do
+
+        it 'returns users that have liked a user, where a match does\'t exist' do
+          expect(test_user.sanitized_likees([555])).to match_array([user_4, user_5])
+        end
+
+        it 'appropriately removes users who\'s ids are passsed into the method' do
+          expect(test_user.sanitized_likees([user_4.id])).to match_array([user_5])
+        end
+
+        it 'removes users from the query who are matched with a user' do 
+          like_3.update_attributes(match: true)
+          expect(test_user.sanitized_likees([555])).to match_array([user_4])
+        end
+
       end
     end
   end
