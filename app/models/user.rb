@@ -57,17 +57,18 @@ class User < ActiveRecord::Base
   
   def feed_users radius
     User.within(radius, origin: [lat, lng])
-    .where(interested_in: User.genders[gender], gender: User.interested_ins[interested_in])
-    .where('id NOT IN (?)', self.likees.pluck(:id))
+      .where(interested_in: User.genders[gender], gender: User.interested_ins[interested_in])
+      .where.not(id: all_users_through_likes.pluck(:id)) #TODO when optimizing, figure out how to make this all happen in one query
   end
 
-  def sanitized_likees seen_this_session_ids # Users with likes where match=f and likee_seen_count < 3
-    # issue where empty seen_this_session_ids array causes weird active record error
-    # potential fix using not, tests passing
-    # old query -> # .where('users.id NOT IN (?)', seen_this_session_ids)
-    self.inverse_likees
-    .where.not(id: seen_this_session_ids)
-    .where('likee_likes.match = ? AND likee_likes.likee_id = ? AND likee_likes.likee_seen_count < ?', false, id, 3)
+  def recent_inverse_likees seen_this_session_ids # Users with likes where match=f and likee_seen_count < 3
+    inverse_likees
+      .where.not(id: seen_this_session_ids)
+      .where('likee_likes.match = ? AND likee_likes.likee_id = ? AND likee_likes.likee_seen_count < ?', false, id, 3)
+  end
+
+  def all_users_through_likes # returns all users who you have liked or have liked you
+    joins_likes.where('(likee_likes.likee_id = ?) OR (liker_likes.user_id = ?)', id, id)
   end
 
   private

@@ -17,23 +17,13 @@ end
 
 class FeedsController
  def index
-    @users = @user.feed_users(some_param).order('some_attr').limit(LIMIT).offset(@offset * LIMIT)
+    @users = @user.feed_users(params[:radius]).order('some_attr').limit(LIMIT).offset(@offset * LIMIT)
 
     #get the users who have liked you, and sprinkle them in
-    @users_whove_liked_you = @user.inverse_likees
-                              .where('users.id NOT IN (?)', params[:ids_of_users_seen_this_session]) #pass this parameter back and forth between the view, 
-                                                                                                     #adding to it the ids of all of the users who have liked you 
-                                                                                                     #that you have seen during this session
-                              #likee_seen_count query is psuedo code, needs to be updated
-                              .where('(likee_likes.match = ? AND likee_likes.likee_id = ? AND likee_likes.likee_seen_count < ?'), false, user.id, SOME_CONTSANT)
-                              #the purpose of likee_seen_count query is to ensure that the same user is not being put to the top 
-                              #of our feed over and over again
-
-                              #NOTE: query above this point should be in USER MODEL
-
-                              .shuffle(!) #from the docs
-                              .limit(params[:random_limit])
-                              .offset(params[:rand_offset])
+    @users_whove_liked_you = @user.recent_inverse_likees(params[:seen_this_session_ids])
+                              .order('random()') # must switch to postgres for this to work
+                              .limit(params[:random_limit]) # keep track of this in swift
+                              .offset(params[:rand_offset]) # keep track of this in swift
 
     users = (@users + @users_whove_liked_you).map do |user|
       {
