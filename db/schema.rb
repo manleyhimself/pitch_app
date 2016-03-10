@@ -13,6 +13,9 @@
 
 ActiveRecord::Schema.define(version: 20160310171644) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "images", force: :cascade do |t|
     t.integer  "user_id"
     t.string   "img_src"
@@ -23,7 +26,7 @@ ActiveRecord::Schema.define(version: 20160310171644) do
     t.datetime "updated_at",  null: false
   end
 
-  add_index "images", ["user_id"], name: "index_images_on_user_id"
+  add_index "images", ["user_id"], name: "index_images_on_user_id", using: :btree
 
   create_table "likes", force: :cascade do |t|
     t.integer  "user_id"
@@ -35,8 +38,8 @@ ActiveRecord::Schema.define(version: 20160310171644) do
     t.integer  "likee_seen_count", default: 0
   end
 
-  add_index "likes", ["likee_id"], name: "index_likes_on_likee_id"
-  add_index "likes", ["user_id"], name: "index_likes_on_user_id"
+  add_index "likes", ["likee_id"], name: "index_likes_on_likee_id", using: :btree
+  add_index "likes", ["user_id"], name: "index_likes_on_user_id", using: :btree
 
   create_table "matches", force: :cascade do |t|
     t.integer  "user_1_id"
@@ -50,9 +53,9 @@ ActiveRecord::Schema.define(version: 20160310171644) do
     t.boolean  "locked",      default: true
   end
 
-  add_index "matches", ["pitcher_id"], name: "index_matches_on_pitcher_id"
-  add_index "matches", ["user_1_id"], name: "index_matches_on_user_1_id"
-  add_index "matches", ["user_2_id"], name: "index_matches_on_user_2_id"
+  add_index "matches", ["pitcher_id"], name: "index_matches_on_pitcher_id", using: :btree
+  add_index "matches", ["user_1_id"], name: "index_matches_on_user_1_id", using: :btree
+  add_index "matches", ["user_2_id"], name: "index_matches_on_user_2_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "first_name"

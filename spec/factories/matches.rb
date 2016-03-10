@@ -7,11 +7,11 @@
 #  user_2_id   :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  user_1_seen :boolean          default("f")
-#  user_2_seen :boolean          default("f")
+#  user_1_seen :boolean          default("false")
+#  user_2_seen :boolean          default("false")
 #  pitcher_id  :integer
-#  pitch_seen  :boolean          default("f")
-#  locked      :boolean          default("t")
+#  pitch_seen  :boolean          default("false")
+#  locked      :boolean          default("true")
 #
 # Indexes
 #

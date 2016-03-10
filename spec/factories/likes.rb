@@ -7,7 +7,7 @@
 #  likee_id         :integer
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  match            :boolean          default("f")
+#  match            :boolean          default("false")
 #  match_time       :datetime
 #  likee_seen_count :integer          default("0")
 #
