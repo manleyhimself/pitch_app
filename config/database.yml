@@ -7,15 +7,12 @@
 development:
   adapter: postgresql
   encoding: unicode
-  database: blog_development
+  database: pitch_development
   pool: 5
-  username: georgewambold
-  password:
+
 
 test:
   adapter: postgresql
   encoding: unicode
-  database: blog_test
+  database: pitch_test
   pool: 5
-  username: georgewambold
-  password:
