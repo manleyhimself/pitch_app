@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160303164801) do
+ActiveRecord::Schema.define(version: 20160310171644) do
 
   create_table "images", force: :cascade do |t|
     t.integer  "user_id"
@@ -65,11 +65,11 @@ ActiveRecord::Schema.define(version: 20160303164801) do
     t.string   "company_name"
     t.string   "blurb"
     t.date     "birthday"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.float    "lat"
-    t.float    "lng"
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
     t.integer  "interested_in"
+    t.decimal  "lat",           precision: 15, scale: 10, default: 0.0
+    t.decimal  "lng",           precision: 15, scale: 10, default: 0.0
   end
 
 end

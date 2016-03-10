@@ -15,9 +15,9 @@
 #  birthday      :date
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
-#  lat           :float
-#  lng           :float
 #  interested_in :integer
+#  lat           :decimal(15, 10)  default("0.0")
+#  lng           :decimal(15, 10)  default("0.0")
 #
 
 FactoryGirl.define do
