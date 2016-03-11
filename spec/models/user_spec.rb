@@ -175,9 +175,14 @@ RSpec.describe User, type: :model do
           expect(test_user.feed_users(5).empty?).to be(true)
         end
 
-        it 'will not returns users who have liked you' do
-          FactoryGirl.create(:like, user_id: unlikeable_user.id, likee_id: test_user.id)
+        it 'will not returns users who have liked the target user and the associated likee_seen_count is than the limit' do
+          FactoryGirl.create(:like, user_id: unlikeable_user.id, likee_id: test_user.id, likee_seen_count: 1)
           expect(test_user.feed_users(5).empty?).to be(true)
+        end
+
+        it 'will returns users who have liked the target user and the associated likee_seen_count is greater than the limit' do
+          FactoryGirl.create(:like, user_id: unlikeable_user.id, likee_id: test_user.id, likee_seen_count: 3)
+          expect(test_user.feed_users(5)).to match_array([unlikeable_user])
         end
 
         it 'does not break if base user has not liked anyone yet' do
@@ -188,6 +193,11 @@ RSpec.describe User, type: :model do
       describe 'recent_inverse_likees' do
         it 'returns users that have liked a user, where a match does\'t exist' do
           expect(test_user.recent_inverse_likees([])).to match_array([user_4, user_5])
+        end
+
+        it 'removes users with an associated likee_seen_count above the limit' do
+          like_2.update_attributes(likee_seen_count: 3)
+          expect(test_user.recent_inverse_likees([])).to match_array([user_5])
         end
 
         it 'appropriately removes users who\'s ids are passsed into the method' do
