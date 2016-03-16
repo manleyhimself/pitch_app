@@ -1,3 +1,6 @@
+# NOTE: following bash command needed to access rails localhost via port:
+ # rails s -b (ip_address) -p 3000 -e development
+
 class Api::ApiController < ActionController::Base
   # before_action :authenticate
   

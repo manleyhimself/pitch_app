@@ -1,9 +1,10 @@
-class FeedsController < Api::ApiController
+class  Api::V1::FeedsController < Api::ApiController
   before_action :set_user, only: [:index]
 
   def index
     #TODO -- APP REMINDER -- ensure proper likee_seen_counts are updated on viewDisDisappear of the feedView
-    @users = @user.feed_users(index_params[:radius]).order('some_attr').limit(20).offset(index_params[:user_offset] * 20)
+    @users = @user.feed_users(index_params[:radius]).limit(20).offset(index_params[:user_offset].to_i * 20)
+    #random order is probably also needed on this query, which may require adding something like we have below w/ :recent_inverse_likees
 
     #get the users who have liked you, and sprinkle them in
     @users_whove_liked_you = @user.recent_inverse_likees(index_params[:seen_this_session_ids])
@@ -14,8 +15,8 @@ class FeedsController < Api::ApiController
     users = (@users + @users_whove_liked_you).map do |user|
       {
         id: user.id,
-        age: user.age,
-        name: user.name,
+        age: user.birthday,
+        name: user.full_name,
         #other attributes to return
       }
     end
